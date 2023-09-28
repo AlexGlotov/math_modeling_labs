@@ -11,7 +11,7 @@ int main() {
 
 	// Задание 1
 	
-	ofstream data0("data0.txt");
+	std::ofstream data0("data0.txt");
 
 	if (!data0) {
 		return -1;
@@ -19,12 +19,12 @@ int main() {
 	data0.precision(10);
 
 	for (int i = 0; i < 16; i++) {
-		data0 << step[i] << "		" << d_e<double, 2, 1>(x0, step[i], { -1, 1 }) << endl;
+		data0 << step[i] << "		" << d_e<double, 2, 1>(x0, step[i], { -1, 1 }) << std::endl;
 	}
 
 	data0.close();
 
-	double ln_step[100000];
+	std::array<double, 100000> ln_step;
 	ln_step[0] = -35;
 
 	for (int i = 1; i < 100000; i++) {
@@ -32,7 +32,7 @@ int main() {
 		ln_step[i] = ln_step[i - 1] + delta;
 	}
 
-	ofstream data3("data3.txt");
+	std::ofstream data3("data3.txt");
 
 	if (!data3) {
 		return -1;
@@ -40,12 +40,12 @@ int main() {
 	data3.precision(10);
 
 	for (double x : ln_step) {
-		data3 << x << " " << log(abs(d_e<double, 3, 1>(x0, exp(x), { -1, 1, 2}) - e)) << endl;
+		data3 << x << " " << log(abs(d_e<double, 3, 1>(x0, exp(x), { -1, 1, 2}) - e)) << std::endl;
 	}
 
 	data3.close();
 
-	ofstream data4("data4.txt");
+	std::ofstream data4("data4.txt");
 
 	if (!data4) {
 		return -1;
@@ -53,12 +53,12 @@ int main() {
 	data4.precision(10);
 
 	for (double x : ln_step) {
-		data4 << x << " " << log(abs(d_e<double, 4, 1>(x0, exp(x), { -2, -1, 1, 2 }) - e)) << endl;
+		data4 << x << " " << log(abs(d_e<double, 4, 1>(x0, exp(x), { -2, -1, 1, 2 }) - e)) << std::endl;
 	}
 
 	data4.close();
 
-	ofstream data5("data5.txt");
+	std::ofstream data5("data5.txt");
 
 	if (!data5) {
 		return -1;
@@ -66,14 +66,14 @@ int main() {
 	data5.precision(10);
 
 	for (double x : ln_step) {
-		data5 << x << " " << log(abs(d_e<double, 5, 1>(x0, exp(x), { -2, -1, 1, 2, 3 }) - e)) << endl;
+		data5 << x << " " << log(abs(d_e<double, 5, 1>(x0, exp(x), { -2, -1, 1, 2, 3 }) - e)) << std::endl;
 	}
 
 	data5.close();
 
 	 //Задание 2
 
-	ofstream data01("data0-1.txt");
+	std::ofstream data01("data0-1.txt");
 
 	if (!data01) {
 		return -1;
@@ -81,20 +81,12 @@ int main() {
 	data01.precision(10);
 
 	for (int i = 0; i < 16; i++) {
-		data01 << step[i] << "		" << d_e<double, 2, 2>(x0, step[i], { -1, 1 }) << endl;
+		data01 << step[i] << "		" << d_e<double, 2, 2>(x0, step[i], { -1, 1 }) << std::endl;
 	}
 
 	data01.close();
 
-	double ln_step[100000];
-	ln_step[0] = -35;
-
-	for (int i = 1; i < 100000; i++) {
-		double delta = 0.00035;
-		ln_step[i] = ln_step[i - 1] + delta;
-	}
-
-	ofstream data31("data3-1.txt");
+	std::ofstream data31("data3-1.txt");
 
 	if (!data31) {
 		return -1;
@@ -102,12 +94,12 @@ int main() {
 	data31.precision(10);
 
 	for (double x : ln_step) {
-		data31 << x << " " << log(abs(d_e<double, 3, 2>(x0, exp(x), { -1, 1, 2 }) - e)) << endl;
+		data31 << x << " " << log(abs(d_e<double, 3, 2>(x0, exp(x), { -1, 1, 2 }) - e)) << std::endl;
 	}
 
 	data31.close();
 
-	ofstream data41("data4-1.txt");
+	std::ofstream data41("data4-1.txt");
 
 	if (!data41) {
 		return -1;
@@ -115,12 +107,12 @@ int main() {
 	data41.precision(10);
 
 	for (double x : ln_step) {
-		data41 << x << " " << log(abs(d_e<double, 4, 2>(x0, exp(x), { -2, -1, 1, 2 }) - e)) << endl;
+		data41 << x << " " << log(abs(d_e<double, 4, 2>(x0, exp(x), { -2, -1, 1, 2 }) - e)) << std::endl;
 	}
 
 	data41.close();
 
-	ofstream data51("data5-1.txt");
+	std::ofstream data51("data5-1.txt");
 
 	if (!data51) {
 		return -1;
@@ -128,7 +120,7 @@ int main() {
 	data51.precision(10);
 
 	for (double x : ln_step) {
-		data51 << x << " " << log(abs(d_e<double, 5, 2>(x0, exp(x), { -2, -1, 1, 2, 3 }) - e)) << endl;
+		data51 << x << " " << log(abs(d_e<double, 5, 2>(x0, exp(x), { -2, -1, 1, 2, 3 }) - e)) << std::endl;
 	}
 
 	data51.close();

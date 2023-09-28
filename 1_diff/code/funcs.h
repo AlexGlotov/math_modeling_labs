@@ -4,8 +4,6 @@
 #include<array>
 #include<eigen-3.4.0\Eigen\Dense>
 
-using namespace std;
-
 int factorial(int i)
 {
 	if (i == 0) return 1;
@@ -15,13 +13,18 @@ int factorial(int i)
 template<typename RealType, unsigned int N>
 struct DerivativeCoef {
 	RealType centralCoef;
-	array<RealType, N> otherCoeffs;
+	std::array<RealType, N> otherCoeffs;
 };
 
 template<typename RealType, unsigned int N, unsigned int L>
 DerivativeCoef<RealType, N>
-calcDerivativeCoef(const array<RealType, N>& points) noexcept {
-	Eigen::Matrix<RealType, N + 1, N + 1> A = Eigen::Matrix<RealType, N + 1, N + 1>::Ones();
+calcDerivativeCoef(const std::array<RealType, N>& points) noexcept {
+	Eigen::Matrix<RealType, N + 1, N + 1> A;
+
+	for (unsigned int i = 0; i <= N; i++) {
+		A(0, i) = 1;
+	}
+
 	for (unsigned int i = 1; i <= N; i++) {
 		A(i, 0) = 0;
 		for (unsigned int j = 1; j <= N; j++) {
@@ -36,16 +39,16 @@ calcDerivativeCoef(const array<RealType, N>& points) noexcept {
 
 	RealType centralCoef = c(0);
 
-	array<RealType, N> coefs;
+	std::array<RealType, N> coefs;
 	for (unsigned int i = 0; i < N; i++) {
 		coefs[i] = c(i + 1);
 	}
 
-	return DerivativeCoef<RealType, N>{ centralCoef, coefs };
+	return DerivativeCoef<RealType, N>{ centralCoef, coefs};
 }
 
 template<typename RealType, unsigned int N, unsigned int L>
-RealType d_e(const RealType x0, const RealType h, const array<RealType, N>& points) {
+RealType d_e(const RealType x0, const RealType h, const std::array<RealType, N>& points) {
 	DerivativeCoef<double, N> coefs = calcDerivativeCoef<RealType, N, L>(points);
 	double order_const = pow(h, L);
 
