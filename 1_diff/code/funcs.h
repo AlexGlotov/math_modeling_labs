@@ -4,10 +4,23 @@
 #include<array>
 #include<eigen-3.4.0\Eigen\Dense>
 
+/*
 int factorial(int i)
 {
 	if (i == 0) return 1;
 	else return i * factorial(i - 1);
+};
+*/
+template<int n>
+class Factorial {
+public:
+    static const int f = Factorial<n - 1>::f * n;
+};
+
+template<>
+class Factorial<0> {
+public:        
+    static const int f = 1;
 };
 
 template<typename RealType, unsigned int N>
@@ -33,7 +46,7 @@ calcDerivativeCoef(const std::array<RealType, N>& points) noexcept {
 	}
 
 	Eigen::Matrix<RealType, N + 1, 1> b = Eigen::Matrix<RealType, N + 1, 1>::Zero();
-	b(L) = factorial(L);
+	b(L) = Factorial<L>::f;
 
 	Eigen::Vector<RealType, N + 1> c = A.colPivHouseholderQr().solve(b);
 
