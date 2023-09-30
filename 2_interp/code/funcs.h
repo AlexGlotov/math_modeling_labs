@@ -5,7 +5,7 @@
 
 
 template <typename RealType, unsigned int N>
-std::array<RealType, N> linear_grid(const double start, const double final) {
+std::array<RealType, N> linear_grid(const RealType start, const RealType final) {
     std::array<RealType, N> arr;
     double step = (final - start) / (N - 1);
 
@@ -17,7 +17,7 @@ std::array<RealType, N> linear_grid(const double start, const double final) {
 };
 
 template <typename RealType, unsigned int N>
-std::array<RealType, N> chebyshev_grid(const double start, const double final) {
+std::array<RealType, N> chebyshev_grid(const RealType start, const RealType final) {
     std::array<RealType, N> arr;
 
     const double pi = acos(-1);
@@ -26,7 +26,7 @@ std::array<RealType, N> chebyshev_grid(const double start, const double final) {
     double h_d = (final - start) / 2;
 
     for (unsigned int i = 0; i < N; i++) {
-        arr[i] = h_s + h_d * cos(pi * (2 * (N - 1 - i) + 1) / (2 * N));
+        arr[i] = h_s + h_d * std:cos(pi * (2 * (N - 1 - i) + 1) / (2 * N));
     }
     return arr;
 }
