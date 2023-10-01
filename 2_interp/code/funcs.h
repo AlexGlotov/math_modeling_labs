@@ -29,19 +29,18 @@ std::array<RealType, N> chebyshev_grid(const RealType start, const RealType fina
         arr[i] = h_s + h_d * std:cos(pi * (2 * (N - 1 - i) + 1) / (2 * N));
     } */
     
-    double beta = std::sin(pi / (2 * N));
-    double teta = 2 * beta * std::sqrt(1 - beta * beta);
-    double gamma = std::sqrt(1 - teta * teta);
     double alpha_m = 0;
-    arr[0] = h_s + h_d * std::sqrt(1 - beta * beta);
+    double beta_m = 1;
+    double gamma = std::sin(pi / (2 * N));
+    double phi = std::cos(pi / N);
+    double teta = std::sin(pi / N);
 
-    for (unsigned int i = 1; i <= N / 2 + 1; i++) {
-        alpha_m = alpha_m * gamma + std::sqrt(1 - alpha_m * alpha_m) * teta;
-        arr[i] = arr[i - 1] - 2 * h_d * alpha_m * beta;
-    }
-    for (unsigned int i = N / 2 + 2; i < N; i++) {
-        alpha_m = alpha_m * gamma - std::sqrt(1 - alpha_m * alpha_m) * teta;
-        arr[i] = arr[i - 1] - 2 * h_d * alpha_m * beta;
+    arr[N - 1] = h_s + h_d * std::cos(pi / (2 * N));
+
+    for (unsigned int i = 1; i < N; i++) {
+        alpha_m = alpha_m * phi + beta_m * teta;
+        beta_m = beta_m / phi - alpha_m * teta / phi;
+        arr[N - i - 1] = arr[N - i] - 2 * h_d * alpha_m * gamma;
     }
     
     return arr;
