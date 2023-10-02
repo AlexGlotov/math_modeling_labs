@@ -6,7 +6,7 @@ int main() {
     const double start = 0;
     const double end = 10;
     
-    std::ofstream data1("data1.txt");
+    std::ofstream data1("data2.txt");
     data1.precision(10);
 
     for (unsigned int N = 5; N < 1000; N++) {
@@ -17,7 +17,10 @@ int main() {
             values.push_back(std::exp(points[i]));
         }
 
-        CubicSpline<double, double> spline(points, values);
+        double left_der = std::exp(1), right_der = std::exp(10); 
+     
+     
+        CubicSpline<double, double> spline(points, values, left_der, right_der);
 
         double err = 0;
         for (double x = start; x < end; x += end / 10000) {
@@ -28,7 +31,8 @@ int main() {
 
         data1 << N << "      " << err << std::endl;
     }
-    
+
     data1.close();
+
     return 0;
 }

@@ -61,6 +61,9 @@ public:
 template<typename numeratorType, typename denominatorType>
 using DivisType = decltype(std::declval<numeratorType>() / std::declval<denominatorType>());
 
+template<typename Type>
+using DiffType = decltype(std::declval<Type>() - std::declval<Type>());
+
 /** Функция для решения метод0м прогонки **/
 template<typename mType, typename cType>
 std::vector<DivisType<cType, mType>> solve(const ThreeDiagonalMatrix<mType>& matrix,
@@ -108,6 +111,9 @@ std::vector<yType> devided_diffrences(const std::vector<xType>& h,
 
 template<typename xType, typename yType>
 class CubicSpline {
+    using DeltaXType = DiffType<xType>;
+    using DerivType = DivisType<DiffType<yType>, DeltaXType>;
+    using Deriv2Type = DivisType<DiffType<DerivType>, DeltaXType>;
 private:
     std::vector<yType> vec_a;
     std::vector<yType> vec_b;
@@ -116,7 +122,10 @@ private:
     std::vector<xType> points;
 
 public:
-    CubicSpline(const std::vector<xType>& points, const std::vector<yType>& values) : points{ points }
+    CubicSpline(const std::vector<xType>& points, const std::vector<yType>& values,
+        const Deriv2Type& first,  // значение для левой второй производной
+        const Deriv2Type& second  // значение для правой второй производной
+    ) : points{ points }
     {
         const unsigned int N = points.size() - 1;
 
@@ -126,9 +135,11 @@ public:
             h.push_back(points[i + 1] - points[i]);
         }
 
-        vec_c = solve(ThreeDiagonalMatrix<double>(h),
-            devided_diffrences<double, double>(h, values));
-        
+        std::vector<yType> column = devided_diffrences<double, double>(h, values);
+        column[0] = column[0] - first * h[0] / (6 * (h[0] + h[1]));
+        column[N - 2] = column[N - 2] - second * h[N - 1] / (6 * (h[N - 1] + h[N - 2]));
+        vec_c = solve(ThreeDiagonalMatrix<double>(h), column);
+
         for (unsigned int i = 0; i < N; i++) {
             vec_d.push_back((vec_c[i + 1] - vec_c[i]) / (3 * h[i]));
             vec_a.push_back(values[i + 1]);
@@ -144,7 +155,6 @@ public:
         yType y;
 
         if ((x < (*(points.begin() - 0.0001))) || (x > (*(points.end() - 1) + 0.0001))) {
-            std::cout << "The value is outside the area under consideration" << std::endl;
             system("pause");
             return -1;
         }
