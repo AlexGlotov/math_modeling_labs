@@ -17,13 +17,13 @@ int main() {
             values.push_back(std::exp(points[i]));
         }
 
-        double left_der = std::exp(1), right_der = std::exp(10); 
+        double left_der = std::exp(start), right_der = std::exp(end); 
      
      
         CubicSpline<double, double> spline(points, values, left_der, right_der);
 
         double err = 0;
-        for (double x = start; x < end; x += end / 10000) {
+        for (double x = start; x < 0.999 * end; x += end / 10000) {
 
             double delta = abs(spline.interpolate(x) - exp(x));
             err = delta > err ? delta : err;

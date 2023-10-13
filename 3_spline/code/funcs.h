@@ -2,11 +2,12 @@
 #include <vector>
 #include<iostream>
 #include <type_traits>
+#include<array>
 
 template <typename RealType>
 std::vector<RealType> linear_grid(const RealType start, const RealType final, const unsigned int N) {
     std::vector<RealType> arr;
-    double step = (final - start) / (N - 1);
+    Type step = (final - start) / (N - 1);
 
     arr.push_back(start);
     for (unsigned int i = 1; i < N; ++i) {
@@ -15,42 +16,42 @@ std::vector<RealType> linear_grid(const RealType start, const RealType final, co
     return arr;
 };
 
-/** ГЄГ«Г Г±Г± Г¤Г«Гї Г°Г ГЎГ®ГІГ» Г± ГІГ°ГҐГµГ¤ГЁГ ГЈГ®Г­Г Г«ГјГ­Г®Г© Г¬Г ГІГ°ГЁГ¶ГҐГ© **/
+template<typename numeratorType, typename denominatorType>
+using DivisType = decltype(std::declval<numeratorType>() / std::declval<denominatorType>());
+
+template<typename Type>
+using DiffType = decltype(std::declval<Type>() - std::declval<Type>());
+
+/** класс для работы с трехдиагональной матрицей **/
 template<typename Type>
 class ThreeDiagonalMatrix {
 private:
-    std::vector<Type> up_vec; 
-    std::vector<Type> centr_vec; 
-    std::vector<Type> und_vec; 
+    std::vector<std::array<Type, 3>> diag;
 public:
-    ThreeDiagonalMatrix(const std::vector<Type>& a, const std::vector<Type>& b, 
-        const std::vector<Type>& c) : up_vec{ a }, centr_vec{ b }, und_vec{ c } {};
-
-    ThreeDiagonalMatrix(const std::vector<Type> step) {
+    ThreeDiagonalMatrix(const std::vector<Type> &step) {
         const unsigned int N = step.size();
         
-        centr_vec.push_back(2.0 / 3);
-        up_vec.push_back(step[1] / (3 * (step[0] + step[1])));
+        diag.reserve(N - 1);
+
+        diag.push_back({ 0, 2.0 / 3 , step[1] / (3 * (step[0] + step[1])) });
         for (unsigned int i = 1; i < N - 2; i++)
         {
-            centr_vec.push_back(2.0 / 3);
-            up_vec.push_back(step[i + 1] / (3 * (step[i] + step[i + 1])));
-            und_vec.push_back(step[i] / (3 * (step[i] + step[i + 1])));
+            diag.push_back({ step[i + 1] / (3 * (step[i] + step[i + 1])),
+                2.0 / 3, step[i] / (3 * (step[i] + step[i + 1])) });
         }
-        centr_vec.push_back(2.0 / 3);
-        und_vec.push_back(step[N - 2] / (3 * (step[N - 2] + step[N - 1])));
+        diag.push_back({ step[N - 2] / (3 * (step[N - 2] + step[N - 1])), 2.0 / 3, 0 });
     
     }
 
     Type operator() (const unsigned int i, const unsigned int j) const {
         if (i - j == 0) {
-            return centr_vec[i];
+            return diag[i][1];
         }
         else if (i - j == 1) {
-            return up_vec[j];
+            return diag[j][0];
         }
         else if (j - i == 1) {
-            return und_vec[i];
+            return diag[i][2];
         }
         else {
             return -1; 
@@ -58,20 +59,17 @@ public:
     };
 };
 
-template<typename numeratorType, typename denominatorType>
-using DivisType = decltype(std::declval<numeratorType>() / std::declval<denominatorType>());
-
-template<typename Type>
-using DiffType = decltype(std::declval<Type>() - std::declval<Type>());
-
-/** Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї Г°ГҐГёГҐГ­ГЁГї Г¬ГҐГІГ®Г¤0Г¬ ГЇГ°Г®ГЈГ®Г­ГЄГЁ **/
+/** Функция для решения метод0м прогонки **/
 template<typename mType, typename cType>
 std::vector<DivisType<cType, mType>> solve(const ThreeDiagonalMatrix<mType>& matrix,
     const std::vector<cType>& column) 
 {
     const unsigned int N = column.size();
 
-    std::vector<mType> p{ -matrix(0, 1) / matrix(0,0) }, q{ column[0] / matrix(0, 0) };
+    std::vector<mType> p, q;
+    p.reserve(N - 1); q.reserve(N - 1);
+    p.push_back(-matrix(0, 1) / matrix(0, 0));
+    q.push_back(column[0] / matrix(0, 0));
 
     std::vector<DivisType<cType, mType>> sol(N + 2);
 
@@ -99,6 +97,7 @@ std::vector<yType> devided_diffrences(const std::vector<xType>& h,
     const unsigned int N = h.size();
 
     std::vector<yType> dev_dif;
+    dev_dif.reserve(N - 1);
 
     for (unsigned int i = 1; i < N; i++)
     {
@@ -115,62 +114,46 @@ class CubicSpline {
     using DerivType = DivisType<DiffType<yType>, DeltaXType>;
     using Deriv2Type = DivisType<DiffType<DerivType>, DeltaXType>;
 private:
-    std::vector<yType> vec_a;
-    std::vector<yType> vec_b;
-    std::vector<yType> vec_c;
-    std::vector<yType> vec_d;
+    std::vector<std::array<yType, 4>> coefs;
     std::vector<xType> points;
 
 public:
     CubicSpline(const std::vector<xType>& points, const std::vector<yType>& values,
-        const Deriv2Type& first,
-        const Deriv2Type& second  
+        const Deriv2Type& first,  // значение для левой второй производной
+        const Deriv2Type& second  // значение для правой второй производной
     ) : points{ points }
     {
         const unsigned int N = points.size() - 1;
+        coefs.reserve(N);
 
-        std::vector<xType>h;
+        std::vector<xType> h;
+        h.reserve(N);
 
-        for (unsigned int i = 0; i < points.size() - 1; i++) {
+        for (unsigned int i = 0; i < N; i++) {
             h.push_back(points[i + 1] - points[i]);
         }
 
         std::vector<yType> column = devided_diffrences<double, double>(h, values);
         column[0] = column[0] - first * h[0] / (6 * (h[0] + h[1]));
         column[N - 2] = column[N - 2] - second * h[N - 1] / (6 * (h[N - 1] + h[N - 2]));
-        vec_c = solve(ThreeDiagonalMatrix<double>(h), column);
+        std::vector<yType> vec_c = solve(ThreeDiagonalMatrix<double>(h), column);
         vec_c[0] = first / 2;
         vec_c[N] = second / 2;
 
         for (unsigned int i = 0; i < N; i++) {
-            vec_d.push_back((vec_c[i + 1] - vec_c[i]) / (3 * h[i]));
-            vec_a.push_back(values[i + 1]);
-            vec_b.push_back(2 * vec_c[i + 1] * h[i] / 3 + vec_c[i] * h[i] / 3 +
-                (values[i + 1] - values[i]) / h[i]);
+            coefs.push_back({ values[i + 1],
+                2 * vec_c[i + 1] * h[i] / 3 + vec_c[i] * h[i] / 3 + (values[i + 1] - values[i]) / h[i],
+                vec_c[i + 1],
+                (vec_c[i + 1] - vec_c[i]) / (3 * h[i]) });
         }
-        vec_c.erase(vec_c.begin());
 
     };
 
     yType interpolate(const xType& x) const noexcept {
-    
-        yType y;
 
-        if ((x < (*(points.begin() - 0.0001))) || (x > (*(points.end() - 1) + 0.0001))) {
-            system("pause");
-            return -1;
-        }
-            
-        unsigned int k = 1;
-        while (x > (points[k] + 0.0001))
-        {
-            k++;
-        }
+        unsigned int k = std::upper_bound(points.begin(), points.end(), x) - points.begin();
 
-        y = vec_a[k - 1] + vec_b[k - 1] * (x - points[k]) + vec_c[k - 1] * (x - points[k]) * (x - points[k]) +
-            vec_d[k - 1] * (x - points[k]) * (x - points[k]) * (x - points[k]);
-
-        return y;
-
+        return(coefs[k - 1][0] + coefs[k - 1][1] * (x - points[k]) + coefs[k - 1][2] * (x - points[k]) * (x - points[k]) +
+            coefs[k - 1][3] * (x - points[k]) * (x - points[k]) * (x - points[k]));
     };
 };
