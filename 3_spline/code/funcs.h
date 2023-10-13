@@ -22,7 +22,7 @@ using DivisType = decltype(std::declval<numeratorType>() / std::declval<denomina
 template<typename Type>
 using DiffType = decltype(std::declval<Type>() - std::declval<Type>());
 
-/** ГЄГ«Г Г±Г± Г¤Г«Гї Г°Г ГЎГ®ГІГ» Г± ГІГ°ГҐГµГ¤ГЁГ ГЈГ®Г­Г Г«ГјГ­Г®Г© Г¬Г ГІГ°ГЁГ¶ГҐГ© **/
+/** класс для работы с трехдиагональной матрицей **/
 template<typename Type>
 class ThreeDiagonalMatrix {
 private:
@@ -43,23 +43,14 @@ public:
     
     }
 
-    Type operator() (const unsigned int i, const unsigned int j) const {
-        if (i - j == 0) {
-            return diag[i][1];
-        }
-        else if (i - j == 1) {
-            return diag[j][0];
-        }
-        else if (j - i == 1) {
-            return diag[i][2];
-        }
-        else {
-            return -1; 
-        };
+    //вызов i строки 
+    std::array<Type, 3> operator() (const unsigned int i) const {
+        return diag[i];
     };
+
 };
 
-/** Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї Г°ГҐГёГҐГ­ГЁГї Г¬ГҐГІГ®Г¤0Г¬ ГЇГ°Г®ГЈГ®Г­ГЄГЁ **/
+/** Функция для решения метод0м прогонки **/
 template<typename mType, typename cType>
 std::vector<DivisType<cType, mType>> solve(const ThreeDiagonalMatrix<mType>& matrix,
     const std::vector<cType>& column) 
@@ -68,21 +59,22 @@ std::vector<DivisType<cType, mType>> solve(const ThreeDiagonalMatrix<mType>& mat
 
     std::vector<mType> p, q;
     p.reserve(N - 1); q.reserve(N - 1);
-    p.push_back(-matrix(0, 1) / matrix(0, 0));
-    q.push_back(column[0] / matrix(0, 0));
+
+    p.push_back(-matrix(0)[2] / matrix(0)[1]);
+    q.push_back(column[0] / matrix(0)[1]);
 
     std::vector<DivisType<cType, mType>> sol(N + 2);
 
     for (unsigned int i = 1; i < N - 1; i++)
     {
-        p.push_back(-matrix(i, i + 1) / (matrix(i, i - 1) * p[i - 1] + matrix(i, i)));
-        q.push_back((column[i] - matrix(i, i - 1) * q[i - 1]) / (matrix(i, i - 1) * p[i - 1] + matrix(i, i)));
+        p.push_back(-matrix(i)[2] / (matrix(i)[0] * p[i - 1] + matrix(i)[1]));
+        q.push_back((column[i] - matrix(i)[0] * q[i - 1]) / (matrix(i)[0] * p[i - 1] + matrix(i)[1]));
     }
 
     sol[0] = 0;
     sol[N + 1] = 0;
-    sol[N] = (column[N - 1] - matrix(N - 1, N - 2) * q[N - 2]) /
-        (matrix(N - 1, N - 2) * p[N - 2] + matrix(N - 1, N - 1));
+    sol[N] = (column[N - 1] - matrix(N - 1)[0] * q[N - 2]) /
+        (matrix(N - 1)[0] * p[N - 2] + matrix(N - 1)[1]);
     for (unsigned int i = N - 1; i > 0; i--) {
         sol[i] = sol[i + 1] * p[i - 1] + q[i - 1];
     }
@@ -119,8 +111,8 @@ private:
 
 public:
     CubicSpline(const std::vector<xType>& points, const std::vector<yType>& values,
-        const Deriv2Type& first,  // Г§Г­Г Г·ГҐГ­ГЁГҐ Г¤Г«Гї Г«ГҐГўГ®Г© ГўГІГ®Г°Г®Г© ГЇГ°Г®ГЁГ§ГўГ®Г¤Г­Г®Г©
-        const Deriv2Type& second  // Г§Г­Г Г·ГҐГ­ГЁГҐ Г¤Г«Гї ГЇГ°Г ГўГ®Г© ГўГІГ®Г°Г®Г© ГЇГ°Г®ГЁГ§ГўГ®Г¤Г­Г®Г©
+        const Deriv2Type& first,  // значение для левой второй производной
+        const Deriv2Type& second  // значение для правой второй производной
     ) : points{ points }
     {
         const unsigned int N = points.size() - 1;
