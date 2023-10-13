@@ -7,7 +7,7 @@
 template <typename RealType>
 std::vector<RealType> linear_grid(const RealType start, const RealType final, const unsigned int N) {
     std::vector<RealType> arr;
-    Type step = (final - start) / (N - 1);
+    RealType step = (final - start) / (N - 1);
 
     arr.push_back(start);
     for (unsigned int i = 1; i < N; ++i) {
@@ -22,7 +22,7 @@ using DivisType = decltype(std::declval<numeratorType>() / std::declval<denomina
 template<typename Type>
 using DiffType = decltype(std::declval<Type>() - std::declval<Type>());
 
-/** класс для работы с трехдиагональной матрицей **/
+/** ГЄГ«Г Г±Г± Г¤Г«Гї Г°Г ГЎГ®ГІГ» Г± ГІГ°ГҐГµГ¤ГЁГ ГЈГ®Г­Г Г«ГјГ­Г®Г© Г¬Г ГІГ°ГЁГ¶ГҐГ© **/
 template<typename Type>
 class ThreeDiagonalMatrix {
 private:
@@ -59,7 +59,7 @@ public:
     };
 };
 
-/** Функция для решения метод0м прогонки **/
+/** Г”ГіГ­ГЄГ¶ГЁГї Г¤Г«Гї Г°ГҐГёГҐГ­ГЁГї Г¬ГҐГІГ®Г¤0Г¬ ГЇГ°Г®ГЈГ®Г­ГЄГЁ **/
 template<typename mType, typename cType>
 std::vector<DivisType<cType, mType>> solve(const ThreeDiagonalMatrix<mType>& matrix,
     const std::vector<cType>& column) 
@@ -119,8 +119,8 @@ private:
 
 public:
     CubicSpline(const std::vector<xType>& points, const std::vector<yType>& values,
-        const Deriv2Type& first,  // значение для левой второй производной
-        const Deriv2Type& second  // значение для правой второй производной
+        const Deriv2Type& first,  // Г§Г­Г Г·ГҐГ­ГЁГҐ Г¤Г«Гї Г«ГҐГўГ®Г© ГўГІГ®Г°Г®Г© ГЇГ°Г®ГЁГ§ГўГ®Г¤Г­Г®Г©
+        const Deriv2Type& second  // Г§Г­Г Г·ГҐГ­ГЁГҐ Г¤Г«Гї ГЇГ°Г ГўГ®Г© ГўГІГ®Г°Г®Г© ГЇГ°Г®ГЁГ§ГўГ®Г¤Г­Г®Г©
     ) : points{ points }
     {
         const unsigned int N = points.size() - 1;
