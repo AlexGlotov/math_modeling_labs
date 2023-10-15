@@ -133,3 +133,32 @@ decltype(auto) integrate(
 
     return Int;
 };
+
+template<typename Callable, typename RealType, std::size_t N>
+decltype(auto) integrateRR(
+    const Callable& func,  // Интегрируемая функция
+    const typename ArgumentGetter<Callable>::Argument& start,  // начало отрезка
+    const typename ArgumentGetter<Callable>::Argument& end,  // конец отрезка
+    const std::array<RealType, N>& points,  // Узлы квадратуры на отрезке [-1, 1]
+    const std::array<RealType, N>& weights, // Веса узлов квадратуры на отрезка [-1, 1]
+    const RealType err  // величина ошибки
+)
+{
+    double h = end - start;
+
+    RealType Ih = integrate<Callable, RealType, N>(func, start, end, points, weights, h);
+    RealType Ih_2 = integrate<Callable, RealType, N>(func, start, end, points, weights, h/2);
+    RealType delta = h;
+    RealType delta_2 = std::abs(Ih - Ih_2);
+
+    for (double step = h / 4; delta > err; step = step / 2) {
+        delta = delta_2;
+        Ih = Ih_2;
+        Ih_2 = integrate<Callable, RealType, N>(func, start, end, points, weights, step);
+        delta_2 = std::abs(Ih - Ih_2);
+   }
+
+    double p = std::log(delta / delta_2) / std::log(2);
+
+    return Ih_2 + (Ih - Ih_2) / (pow(2, p) - 1) ;
+};
