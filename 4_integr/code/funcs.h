@@ -3,7 +3,7 @@
 #include<iostream>
 #include <array>
 #include <type_traits>
-#include <vector>
+#include <tuple>
 
 /*
 template<typename RealType, unsigned int N>
@@ -88,14 +88,14 @@ struct ArgumentGetter<R(Arg)> {
 template<typename T>
 using Dif = decltype(std::declval<T>() - std::declval<T>());
 
-/* Функция производит интегрирование на одном отрезке */
+/* Г”ГіГ­ГЄГ¶ГЁГї ГЇГ°Г®ГЁГ§ГўГ®Г¤ГЁГІ ГЁГ­ГІГҐГЈГ°ГЁГ°Г®ГўГ Г­ГЁГҐ Г­Г  Г®Г¤Г­Г®Г¬ Г®ГІГ°ГҐГ§ГЄГҐ */
 template<typename Callable, typename RealType, std::size_t N>
 decltype(auto) integrate(
-    const Callable& func,  // Интегрируемая функция
-    const typename ArgumentGetter<Callable>::Argument& start,  // начало отрезка
-    const typename ArgumentGetter<Callable>::Argument& end,  // конец отрезка
-    const std::array<RealType, N>& points,  // Узлы квадратуры на отрезке [-1, 1]
-    const std::array<RealType, N>& weights // Веса узлов квадратуры на отрезка [-1, 1]
+    const Callable& func,  // Г€Г­ГІГҐГЈГ°ГЁГ°ГіГҐГ¬Г Гї ГґГіГ­ГЄГ¶ГЁГї
+    const typename ArgumentGetter<Callable>::Argument& start,  // Г­Г Г·Г Г«Г® Г®ГІГ°ГҐГ§ГЄГ 
+    const typename ArgumentGetter<Callable>::Argument& end,  // ГЄГ®Г­ГҐГ¶ Г®ГІГ°ГҐГ§ГЄГ 
+    const std::array<RealType, N>& points,  // Г“Г§Г«Г» ГЄГўГ Г¤Г°Г ГІГіГ°Г» Г­Г  Г®ГІГ°ГҐГ§ГЄГҐ [-1, 1]
+    const std::array<RealType, N>& weights // Г‚ГҐГ±Г  ГіГ§Г«Г®Гў ГЄГўГ Г¤Г°Г ГІГіГ°Г» Г­Г  Г®ГІГ°ГҐГ§ГЄГ  [-1, 1]
 )
 {
     RealType Int = 0;
@@ -110,15 +110,15 @@ decltype(auto) integrate(
     return Int * semi_dif;
 };
 
-/* Функция производит интегрирование, разбивая отрезок на подотрезки длиной не более dx */
+/* Г”ГіГ­ГЄГ¶ГЁГї ГЇГ°Г®ГЁГ§ГўГ®Г¤ГЁГІ ГЁГ­ГІГҐГЈГ°ГЁГ°Г®ГўГ Г­ГЁГҐ, Г°Г Г§ГЎГЁГўГ Гї Г®ГІГ°ГҐГ§Г®ГЄ Г­Г  ГЇГ®Г¤Г®ГІГ°ГҐГ§ГЄГЁ Г¤Г«ГЁГ­Г®Г© Г­ГҐ ГЎГ®Г«ГҐГҐ dx */
 template<typename Callable, typename RealType, std::size_t N>
 decltype(auto) integrate(
-    const Callable& func,  // Интегрируемая функция
-    const typename ArgumentGetter<Callable>::Argument& start,  // начало отрезка
-    const typename ArgumentGetter<Callable>::Argument& end,  // конец отрезка
-    const std::array<RealType, N>& points,  // Узлы квадратуры на отрезке [-1, 1]
-    const std::array<RealType, N>& weights, // Веса узлов квадратуры на отрезка [-1, 1]
-    const Dif<typename ArgumentGetter<Callable>::Argument>& dx  // Длина подотрезка
+    const Callable& func,  // Г€Г­ГІГҐГЈГ°ГЁГ°ГіГҐГ¬Г Гї ГґГіГ­ГЄГ¶ГЁГї
+    const typename ArgumentGetter<Callable>::Argument& start,  // Г­Г Г·Г Г«Г® Г®ГІГ°ГҐГ§ГЄГ 
+    const typename ArgumentGetter<Callable>::Argument& end,  // ГЄГ®Г­ГҐГ¶ Г®ГІГ°ГҐГ§ГЄГ 
+    const std::array<RealType, N>& points,  // Г“Г§Г«Г» ГЄГўГ Г¤Г°Г ГІГіГ°Г» Г­Г  Г®ГІГ°ГҐГ§ГЄГҐ [-1, 1]
+    const std::array<RealType, N>& weights, // Г‚ГҐГ±Г  ГіГ§Г«Г®Гў ГЄГўГ Г¤Г°Г ГІГіГ°Г» Г­Г  Г®ГІГ°ГҐГ§ГЄГ  [-1, 1]
+    const Dif<typename ArgumentGetter<Callable>::Argument>& dx  // Г„Г«ГЁГ­Г  ГЇГ®Г¤Г®ГІГ°ГҐГ§ГЄГ 
 )
 {
     unsigned int L = (end - start) / dx + 1;
@@ -136,12 +136,12 @@ decltype(auto) integrate(
 
 template<typename Callable, typename RealType, std::size_t N>
 decltype(auto) integrateRR(
-    const Callable& func,  // Интегрируемая функция
-    const typename ArgumentGetter<Callable>::Argument& start,  // начало отрезка
-    const typename ArgumentGetter<Callable>::Argument& end,  // конец отрезка
-    const std::array<RealType, N>& points,  // Узлы квадратуры на отрезке [-1, 1]
-    const std::array<RealType, N>& weights, // Веса узлов квадратуры на отрезка [-1, 1]
-    const RealType err  // величина ошибки
+    const Callable& func,  // Г€Г­ГІГҐГЈГ°ГЁГ°ГіГҐГ¬Г Гї ГґГіГ­ГЄГ¶ГЁГї
+    const typename ArgumentGetter<Callable>::Argument& start,  // Г­Г Г·Г Г«Г® Г®ГІГ°ГҐГ§ГЄГ 
+    const typename ArgumentGetter<Callable>::Argument& end,  // ГЄГ®Г­ГҐГ¶ Г®ГІГ°ГҐГ§ГЄГ 
+    const std::array<RealType, N>& points,  // Г“Г§Г«Г» ГЄГўГ Г¤Г°Г ГІГіГ°Г» Г­Г  Г®ГІГ°ГҐГ§ГЄГҐ [-1, 1]
+    const std::array<RealType, N>& weights, // Г‚ГҐГ±Г  ГіГ§Г«Г®Гў ГЄГўГ Г¤Г°Г ГІГіГ°Г» Г­Г  Г®ГІГ°ГҐГ§ГЄГ  [-1, 1]
+    const RealType err  // ГўГҐГ«ГЁГ·ГЁГ­Г  Г®ГёГЁГЎГЄГЁ
 )
 {
     double h = end - start;
@@ -161,4 +161,33 @@ decltype(auto) integrateRR(
     double p = std::log(delta / delta_2) / std::log(2);
 
     return Ih_2 + (Ih - Ih_2) / (pow(2, p) - 1) ;
+};
+
+//bonus task
+template<typename Callable, typename RealType, std::size_t N>
+decltype(auto) integrate_(
+    const Callable& func,  // РРЅС‚РµРіСЂРёСЂСѓРµРјР°СЏ С„СѓРЅРєС†РёСЏ
+    const typename ArgumentGetter<Callable>::Argument& start,  // РЅР°С‡Р°Р»Рѕ РѕС‚СЂРµР·РєР°
+    const typename ArgumentGetter<Callable>::Argument& end,  // РєРѕРЅРµС† РѕС‚СЂРµР·РєР°
+    const std::array<RealType, N>& points,  // РЈР·Р»С‹ РєРІР°РґСЂР°С‚СѓСЂС‹ РЅР° РѕС‚СЂРµР·РєРµ [-1, 1]
+    const std::array<RealType, N>& weights, // Р’РµСЃР° СѓР·Р»РѕРІ РєРІР°РґСЂР°С‚СѓСЂС‹ РЅР° РѕС‚СЂРµР·РєР° [-1, 1]
+    const Dif<typename ArgumentGetter<Callable>::Argument>& dx  // Р”Р»РёРЅР° РїРѕРґРѕС‚СЂРµР·РєР°
+)
+{
+    unsigned int L = (end - start) / dx + 1;
+    double step = (end - start) / L;
+
+    unsigned int num_sections = 0;
+
+    RealType Int = 0;
+
+    for (int i = 0; i < L; i++) {
+        Int += integrate<Callable, RealType, N>(func, start + i * step,
+            start + (i + 1) * step, points, weights);
+        num_sections++;
+    }
+    
+    std::tuple<RealType, unsigned int> ret(Int, num_sections);
+
+    return ret;
 };
