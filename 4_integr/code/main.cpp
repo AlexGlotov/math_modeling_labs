@@ -9,11 +9,11 @@ int main()
 	const double end = 10;
 
 	//std::ofstream data2("data2_RR.txt");
-	//data2.precision(16);
+	//data2.precision(10);
 	std::ofstream data3("data3_RR.txt");
-	data3.precision(16);
+	data3.precision(10);
 	//std::ofstream data5("data5_RR.txt");
-	//data2.precision(16);
+	//data2.precision(10);
 
 	const double I = 1 - std::cos(10);
 	for (double h = -7; h < 1; h += 0.001) {
