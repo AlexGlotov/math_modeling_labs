@@ -31,9 +31,9 @@ Eigen::Vector<double, 6> orbit(const Eigen::Vector<double, 6> state, const doubl
     return res;
 }
 
-ÑauchyProblem<decltype(lin), 1> linear;
-ÑauchyProblem<decltype(osc), 2> oscillator;
-ÑauchyProblem<decltype(orbit), 6> Earth;
+Ã‘auchyProblem<decltype(lin), 1> linear;
+Ã‘auchyProblem<decltype(osc), 2> oscillator;
+Ã‘auchyProblem<decltype(orbit), 6> Earth;
 
 int main() {
     
@@ -50,7 +50,7 @@ int main() {
         double step = std::pow(10, h);
 
         auto res1
-            = integrate<decltype(lin), BDF4, ÑauchyProblem<decltype(lin), 1>, RK4Table>(lin, { Eigen::Vector<double, 1>(0.0), start }, end, {step, 1e-6, 10}, linear);
+            = integrate<decltype(lin), BDF4, Ã‘auchyProblem<decltype(lin), 1>, RK4Table>(lin, { Eigen::Vector<double, 1>(0.0), start }, end, {step, 1e-6, 10}, linear);
         double err1 = (res1[0].state[0] - ans1(start));
 
         double delta;
@@ -61,7 +61,7 @@ int main() {
         }
 
         auto res2
-            = integrate<decltype(osc), BDF4, ÑauchyProblem<decltype(osc), 2>, RK4Table>(osc, { Eigen::Vector<double, 2>(0.0, 1.0), start }, end, { step, 1e-6, 10 }, oscillator);
+            = integrate<decltype(osc), BDF4, Ã‘auchyProblem<decltype(osc), 2>, RK4Table>(osc, { Eigen::Vector<double, 2>(0.0, 1.0), start }, end, { step, 1e-6, 10 }, oscillator);
         double err2 = (res2[0].state[0] - ans2(start));
 
         for (unsigned int i = 1; i < res2.size(); i++){
@@ -80,7 +80,7 @@ int main() {
     data3.precision(16);
 
     auto res
-        = integrate<decltype(orbit), BDF4, ÑauchyProblem<decltype(orbit), 6>, RK4Table>(orbit, { Eigen::Vector<double, 6>(35786, 0.0, 0.0, 0.0, 2.90, 1.0), 0 }, 10000, { 0.001, 1e-6, 10 }, Earth);
+        = integrate<decltype(orbit), BDF4, Ã‘auchyProblem<decltype(orbit), 6>, RK4Table>(orbit, { Eigen::Vector<double, 6>(35786, 0.0, 0.0, 0.0, 2.90, 1.0), 0 }, 100000, { 1, 1e-4, 20 }, Earth);
 
     for (unsigned int i = 0; i < res.size(); i++) {
         data3 << res[i].state[0] << "   " << res[i].state[1] << "   " << res[i].state[2] << std::endl;
